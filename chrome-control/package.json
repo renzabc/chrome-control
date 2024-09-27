@@ -3,7 +3,10 @@
     "author": "Renz A",
     "description": "cdp wrapper using ts to automate chromium browsers",
     "main": "",
+    "type": "module",
     "scripts": {},
-    "dependencies": {},
-    "license": ""
+    "license": "",
+    "devDependencies": {
+        "@types/ws": "^8.5.12"
+    }
 }
