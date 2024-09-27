@@ -7,3 +7,20 @@ import http from 'http'
 
 
 // Classes
+
+// BROWSER: Launch a browser instance with certain options/settings.
+
+
+
+// KEYBOARD STROKES
+
+
+
+// MOUSE CLICKS
+
+
+
+
+
+
+

@@ -1,0 +1,1 @@
+A chromium automation framework without the bloat

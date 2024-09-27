@@ -1,0 +1,9 @@
+{
+    "name": "chrome-control",
+    "author": "Renz A",
+    "description": "cdp wrapper using ts to automate chromium browsers",
+    "main": "",
+    "scripts": {},
+    "dependencies": {},
+    "license": ""
+}
