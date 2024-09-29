@@ -1,4 +1,4 @@
-// import WebSocket from 'ws';
+import WebSocket from 'ws';
 import * as fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
@@ -53,8 +53,9 @@ class Chromium {
             console.log('Could not launch Chrome Instance: ', error);
             return false;
         }
+        await this.delay(5000);
         if (await this.connectWS(this.port) != true) {
-            console.log(`Could NOT connect to Browser ${this.process.pid}`);
+            // throw new Error(`Could NOT connect to Browser ${this.process.pid}`)
         }
         return true;
     }
@@ -75,6 +76,7 @@ class Chromium {
                     this.ws = new WebSocket(this.wsUrl);
                     await this.ws.addEventListener('open', () => {
                         tryCount = 10;
+                        console.log('CONNECTED to Browser');
                         return true;
                     });
                 }
@@ -87,9 +89,39 @@ class Chromium {
         }
         return false;
     }
-    async send(command) {
+    async send(method, params) {
+        return new Promise((resolve, reject) => {
+            const message = JSON.stringify({ id: 1, method, params });
+            this.ws.send(message);
+            const listener = (data) => {
+                const response = JSON.parse(data);
+                if (response.id === 1) {
+                    this.ws.removeListener('message', listener);
+                    resolve(response);
+                }
+            };
+            this.ws.on('message', listener);
+        });
     }
     async goto(url) {
+        console.log(`Navigating to ${url}`);
+        await this.send('Page.enable', {});
+        await this.send('Network.enable', {});
+        await this.send('Page.navigate', { url });
+        // Wait for the page to finish loading
+        return new Promise((resolve, reject) => {
+            const listener = (data) => {
+                const event = JSON.parse(data);
+                if (event.method === 'Page.loadEventFired') {
+                    this.ws.removeListener('message', listener);
+                    // add delay?
+                }
+                else if (event.method === 'Inspector.detached') {
+                    this.ws.removeListener('message', listener);
+                }
+            };
+            this.ws.on('message', listener);
+        });
     }
     async executeScript(script) {
     }
@@ -137,7 +169,7 @@ class Browser {
             }
         }
         // return the current value so we know that the browser instance is live
-        return [this._browser, this._binaryPath];
+        return this._browser;
     }
     async stop() {
         if (this._browser) {
