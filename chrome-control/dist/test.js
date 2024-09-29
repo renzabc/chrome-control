@@ -20,6 +20,6 @@ let test = async () => {
     // await browser.clickMouse()
     // await browser.type()
     console.log('passed: ', browser);
-    await browser.stop(); // closes the browser and kills the process
+    await instance.stop(); // closes the browser and kills the process
 };
 test().catch(console.error);

@@ -143,6 +143,7 @@ class Chromium {
                 if (event.method === 'Page.loadEventFired') {
                     this.ws.removeListener('message', listener);
                     // add delay?
+                    this.delay(2000).then(resolve)
                 } else if (event.method === 'Inspector.detached') {
                     this.ws.removeListener('message', listener);
                 }
