@@ -55,7 +55,7 @@ class Chromium {
         }
         await this.delay(5000);
         if (await this.connectWS(this.port) != true) {
-            // throw new Error(`Could NOT connect to Browser ${this.process.pid}`)
+            throw new Error(`Could NOT connect to Browser ${this.process.pid}`);
         }
         return true;
     }
@@ -74,11 +74,16 @@ class Chromium {
                 if (page) {
                     this.wsUrl = page.webSocketDebuggerUrl;
                     this.ws = new WebSocket(this.wsUrl);
-                    await this.ws.addEventListener('open', () => {
-                        tryCount = 10;
-                        console.log('CONNECTED to Browser');
-                        return true;
+                    await new Promise((resolve, reject) => {
+                        this.ws.addEventListener('open', () => {
+                            console.log('CONNECTED to Browser');
+                            resolve(true);
+                        });
+                        this.ws.addEventListener('error', (error) => {
+                            reject(error);
+                        });
                     });
+                    return true;
                 }
             }
             catch (error) {
